@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands,tasks
+from discord.ext import commands
 import os
 from dotenv import load_dotenv
 from functions.youtClass import YTDLSource
@@ -37,8 +37,11 @@ async def play(ctx,url):
         server = ctx.message.guild
         voice_channel = server.voice_client
 
+        if (voice_channel == None):
+            await join(ctx)
+            voice_channel = server.voice_client
+
         async with ctx.typing():
-            print(voice_channel.is_playing())
             if (not voice_channel.is_playing()):
                 cleanMusics()
             filename = await YTDLSource.from_url(url, loop=bot.loop)
@@ -65,7 +68,7 @@ async def resume(ctx):
     if voice_client.is_paused():
         await voice_client.resume()
     else:
-        await ctx.send("The bot was not playing anything before this. Use play_song command")
+        await ctx.send("The bot was not playing anything before this. Use ##p command")
 
 @bot.command(name='stop', help='Stops the song')
 async def stop(ctx):
@@ -76,5 +79,5 @@ async def stop(ctx):
         await ctx.send("The bot is not playing anything at the moment.")
 
 if __name__ == "__main__" :
-    bot.run(DISCORD_TOKEN)
     print('bot running')
+    bot.run(DISCORD_TOKEN)
